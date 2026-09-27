@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, Plus, Trash2, Pencil, ShieldCheck, Sparkles, Image, Link as LinkIcon, Tag } from 'lucide-react';
+import { X, Lock, Plus, Trash2, Pencil, ShieldCheck, Sparkles, Image, Link as LinkIcon, Tag, Eye, EyeOff } from 'lucide-react';
 import { Project } from '../types';
 
 interface AdminModalProps {
@@ -23,6 +23,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -121,8 +122,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'admin';
-    if (password === adminPassword) {
+    const adminPassword = (import.meta.env.VITE_ADMIN_PASSWORD || 'admin').trim();
+    if (password.trim() === adminPassword) {
       setIsAuthenticated(true);
       setError('');
     } else {
@@ -209,14 +210,29 @@ export const AdminModal: React.FC<AdminModalProps> = ({
             <p className="text-sm text-neutral-400 mb-6">Enter your administrator password to access the cloud publishing dashboard.</p>
             
             <form onSubmit={handleLogin} className="space-y-4">
-              <input
-                type="password"
-                placeholder="Enter password (admin)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-none focus:border-neutral-600 text-sm text-center font-mono"
-                autoFocus
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter administrator password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-4 pr-11 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-none focus:border-neutral-600 text-sm font-mono text-center"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-neutral-400 hover:text-neutral-100 transition-colors cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 text-neutral-400 hover:text-neutral-200" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-neutral-400 hover:text-neutral-200" />
+                  )}
+                </button>
+              </div>
               {error && (
                 <div className="p-3 rounded-lg bg-red-950/80 border border-red-800 text-red-300 text-xs font-medium flex items-center justify-center gap-2 animate-shake">
                   {error}
