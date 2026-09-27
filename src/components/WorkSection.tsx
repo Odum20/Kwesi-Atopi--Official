@@ -10,11 +10,29 @@ interface WorkSectionProps {
 export const WorkSection: React.FC<WorkSectionProps> = ({ projects, onSelectProject }) => {
   const [selectedTag, setSelectedTag] = useState<string>('All');
 
-  const allTags = ['All', ...Array.from(new Set(projects.flatMap(p => p.tags)))];
+  // Ensure GIS and Sat intel are present among the filter buttons, excluding any 'FEATURED' tag
+  const baseTags = ['All', 'SYSTEMS', 'FINTECH', 'GIS', 'Sat intel'];
+  const projectTags = Array.from(new Set(projects.flatMap(p => p.tags))).filter(
+    tag => tag.toUpperCase() !== 'FEATURED' && !baseTags.some(b => b.toLowerCase() === tag.toLowerCase())
+  );
+  const allTags = [...baseTags, ...projectTags];
 
   const filteredProjects = selectedTag === 'All' 
     ? projects 
-    : projects.filter(p => p.tags.includes(selectedTag));
+    : projects.filter(p => 
+        p.tags.some(t => t.toLowerCase() === selectedTag.toLowerCase()) ||
+        (selectedTag.toLowerCase() === 'sat intel' && (
+          p.tags.some(t => t.toLowerCase().includes('sat')) ||
+          p.title.toLowerCase().includes('environmental') ||
+          p.subtitle.toLowerCase().includes('satellite') ||
+          p.description.toLowerCase().includes('satellite')
+        )) ||
+        (selectedTag.toLowerCase() === 'gis' && (
+          p.tags.some(t => t.toLowerCase() === 'gis') ||
+          p.description.toLowerCase().includes('geospatial') ||
+          p.title.toLowerCase().includes('environmental')
+        ))
+      );
 
   return (
     <section id="work" className="py-24 border-t border-neutral-900">
@@ -24,7 +42,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({ projects, onSelectProj
           <div>
             <div className="text-xs uppercase tracking-widest text-neutral-500 font-mono mb-2">01 // Portfolio</div>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-100">
-              Featured Work
+              Work
             </h2>
           </div>
 

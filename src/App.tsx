@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Lock, X } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { WorkSection } from './components/WorkSection';
@@ -14,14 +15,16 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<string>('work');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
+  const [isAdminButtonVisible, setIsAdminButtonVisible] = useState<boolean>(false);
 
   const { projects, experiments, addProject, updateProject, removeProject } = useProjects();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.altKey && (e.key === 'a' || e.key === 'A')) {
+      // Secret key combination: Ctrl + Alt + A (or Cmd + Alt + A on Mac)
+      if ((e.ctrlKey || e.metaKey) && e.altKey && (e.key === 'a' || e.key === 'A')) {
         e.preventDefault();
-        setIsAdminOpen(true);
+        setIsAdminButtonVisible((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -61,8 +64,30 @@ export default function App() {
         <ContactSection />
       </main>
 
-      {/* Footer */}
-      <Footer onOpenAdmin={() => setIsAdminOpen(true)} />
+      {/* Footer - completely clean, normal users see zero admin controls */}
+      <Footer />
+
+      {/* Secret Admin Padlock Button (Only reveals after Ctrl + Alt + A) */}
+      {isAdminButtonVisible && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-1.5 p-1 bg-neutral-900 border border-neutral-700/80 rounded-full shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <button
+            onClick={() => setIsAdminOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-100 text-xs font-mono font-medium transition-colors cursor-pointer shadow-sm group"
+            title="Open Admin Dashboard"
+          >
+            <Lock className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+            <span>Admin</span>
+          </button>
+          <button
+            onClick={() => setIsAdminButtonVisible(false)}
+            className="p-1.5 text-neutral-400 hover:text-neutral-200 rounded-full hover:bg-neutral-800 transition-colors cursor-pointer"
+            title="Hide Admin button"
+            aria-label="Hide Admin"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* Project Detail Modal */}
       <ProjectDetailModal

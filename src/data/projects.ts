@@ -47,7 +47,7 @@ export const projectsData: Project[] = [
     subtitle: 'Satellite telemetry and carbon flux monitoring system',
     description: 'Geospatial analytics platform processing multispectral satellite imagery to track deforestation, air quality indices, and corporate carbon footprints.',
     image: '/src/assets/images/project_environmental_intelligence_1790444085656.jpg',
-    tags: ['AI', 'GIS'],
+    tags: ['GIS', 'Sat intel'],
     year: '2025',
     role: 'Creator & Lead Developer',
     technologies: ['Python', 'FastAPI', 'React', 'Mapbox GL', 'TensorFlow'],

@@ -72,7 +72,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     setIsExperiment(false);
   };
 
-  const availableTags = ['SYSTEMS', 'FINTECH', 'AI', 'GAMING', 'AUDIO', 'PHYSICS', 'FEATURED', 'WEB3'];
+  const availableTags = ['SYSTEMS', 'FINTECH', 'GIS', 'Sat intel', 'AI', 'GAMING', 'AUDIO', 'PHYSICS', 'WEB3'];
 
   if (!isOpen) return null;
 
@@ -390,7 +390,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
                   <div>
-                    <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5">Select Tag / Filter</label>
+                    <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5">Select Tag / Category</label>
                     <div className="flex flex-wrap gap-2">
                       {availableTags.map((tag) => (
                         <button

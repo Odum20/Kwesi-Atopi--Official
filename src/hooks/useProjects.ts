@@ -27,6 +27,12 @@ export function useProjects() {
         snapshot.forEach((docSnap) => {
           const data = docSnap.data() as Project;
           const proj = { ...data, id: docSnap.id };
+          if (proj.id === 'environmental-intelligence') {
+            if (!proj.tags.includes('Sat intel') || !proj.tags.includes('GIS')) {
+              proj.tags = ['GIS', 'Sat intel'];
+              setDoc(doc(db, 'projects', proj.id), { tags: ['GIS', 'Sat intel'] }, { merge: true });
+            }
+          }
           if (proj.isExperiment) {
             remoteExperiments.push(proj);
           } else {
