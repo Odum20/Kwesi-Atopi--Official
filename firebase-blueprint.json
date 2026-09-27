@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "Portfolio work item posted by admin",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "projectUrl": { "type": "string" },
+        "tag": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "description", "imageUrl", "projectUrl", "tag"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Collection of portfolio projects and works visible to all visitors"
+    }
+  }
+}
