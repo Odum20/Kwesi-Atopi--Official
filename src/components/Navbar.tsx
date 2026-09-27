@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Linkedin, Terminal } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Linkedin, Terminal, Sun, Moon } from 'lucide-react';
 import { CONTACT_CONFIG } from '../config/contact';
+import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   activeSection: string;
@@ -10,6 +11,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ activeSection, onNavigate }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, onNavigate }) => 
           onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           className="flex items-center gap-2 text-left group cursor-pointer"
         >
-          <div className="w-7 h-7 rounded-lg bg-neutral-900 border border-neutral-700 flex items-center justify-center text-neutral-200 group-hover:border-neutral-500 transition-colors">
+          <div className="w-7 h-7 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-200 group-hover:border-neutral-600 transition-colors">
             <Terminal className="w-3.5 h-3.5" />
           </div>
           <span className="font-semibold text-neutral-100 tracking-tight text-base">
@@ -47,11 +49,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, onNavigate }) => 
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`transition-colors hover:text-neutral-100 cursor-pointer py-1 relative ${activeSection === item.id ? 'text-neutral-100' : ''}`}
+              className={`transition-colors hover:text-neutral-100 cursor-pointer py-1 relative ${activeSection === item.id ? 'text-neutral-100 font-semibold' : ''}`}
             >
               {item.label}
               {activeSection === item.id && (
-                <span className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
+                <span className="absolute bottom-0 left-0 right-0 h-px bg-neutral-100" />
               )}
             </button>
           ))}
@@ -59,6 +61,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, onNavigate }) => 
 
         {/* Zone 3: Primary Actions */}
         <div className="flex items-center gap-3">
+          {/* Theme Toggle Button (Desktop & Tablet only; on mobile it is in the hamburger menu) */}
+          <button
+            onClick={toggleTheme}
+            className="hidden sm:inline-flex p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-neutral-100 transition-colors cursor-pointer"
+            aria-label="Toggle Theme"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-neutral-800" />}
+          </button>
+
           <a
             href={CONTACT_CONFIG.linkedinUrl}
             target="_blank"
@@ -71,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, onNavigate }) => 
           </a>
           <button
             onClick={() => onNavigate('contact')}
-            className="px-4 py-1.5 text-xs font-medium text-neutral-950 bg-neutral-100 rounded-lg hover:bg-white transition-colors whitespace-nowrap cursor-pointer shadow-sm"
+            className="px-4 py-1.5 text-xs font-medium text-neutral-950 bg-neutral-100 rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap cursor-pointer shadow-sm"
           >
             Let's Talk
           </button>
@@ -113,6 +125,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, onNavigate }) => 
                 <Linkedin className="w-4 h-4" />
                 <span>LinkedIn Profile</span>
               </a>
+              <button
+                onClick={() => {
+                  toggleTheme();
+                  setMobileMenuOpen(false);
+                }}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-sm text-neutral-300 hover:text-neutral-100 transition-colors cursor-pointer"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-neutral-800" />}
+                <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+              </button>
             </div>
           </nav>
         </div>
@@ -120,3 +142,4 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, onNavigate }) => 
     </header>
   );
 };
+

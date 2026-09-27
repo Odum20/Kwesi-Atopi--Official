@@ -4,10 +4,34 @@
   --color-pine: #0c3016;
 }
 
+html.light {
+  --color-neutral-950: #fafafa;
+  --color-neutral-900: #ffffff;
+  --color-neutral-850: #f4f4f5;
+  --color-neutral-800: #e4e4e7;
+  --color-neutral-700: #d4d4d8;
+  --color-neutral-600: #a1a1aa;
+  --color-neutral-500: #71717a;
+  --color-neutral-400: #52525b;
+  --color-neutral-300: #27272a;
+  --color-neutral-200: #18181b;
+  --color-neutral-100: #09090b;
+}
+
+html.light ::selection {
+  background-color: #e4e4e7;
+  color: #09090b;
+}
+
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--color-neutral-950, #030712);
+    color: var(--color-neutral-100, #f5f5f5);
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
   }
@@ -15,3 +39,4 @@
     font-family: 'JetBrains Mono', monospace;
   }
 }
+

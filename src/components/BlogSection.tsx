@@ -51,7 +51,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ posts, onSelectPost })
                   <span className="text-neutral-300">{post.tags.join(' / ')}</span>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-bold text-neutral-100 group-hover:text-white mb-2 transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-neutral-100 mb-2 transition-colors">
                   {post.title}
                 </h3>
 

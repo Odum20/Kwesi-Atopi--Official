@@ -76,7 +76,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({ projects, onSelectProj
                     <span>{project.role}</span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-neutral-100 group-hover:text-white mb-2 flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-neutral-100 mb-2 flex items-center justify-between">
                     <span>{project.title}</span>
                     <ArrowUpRight className="w-4 h-4 text-neutral-500 group-hover:text-neutral-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </h3>

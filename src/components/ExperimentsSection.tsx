@@ -55,7 +55,7 @@ export const ExperimentsSection: React.FC<ExperimentsSectionProps> = ({ experime
                     <span>{experiment.tags.join(' · ')}</span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-neutral-100 group-hover:text-white mb-2 flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-neutral-100 mb-2 flex items-center justify-between">
                     <span>{experiment.title}</span>
                     <ArrowUpRight className="w-4 h-4 text-neutral-500 group-hover:text-neutral-100 transition-all" />
                   </h3>

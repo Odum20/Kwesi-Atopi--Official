@@ -137,7 +137,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 hover:bg-white text-neutral-950 text-sm font-medium transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 hover:opacity-90 text-neutral-950 text-sm font-medium transition-opacity shadow-sm"
                 >
                   <span>Visit Link</span>
                   <ExternalLink className="w-4 h-4" />

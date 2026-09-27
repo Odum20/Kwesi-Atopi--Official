@@ -130,7 +130,7 @@ export const ContactSection: React.FC = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-neutral-100 text-neutral-950 rounded-xl font-medium text-sm hover:bg-white transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3.5 bg-neutral-100 text-neutral-950 rounded-xl font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
                   <span>Send Message</span>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 interface TechIcon {
   name: string;
@@ -11,6 +12,8 @@ interface TechIcon {
 export const TechBackgroundCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -75,12 +78,14 @@ export const TechBackgroundCanvas: React.FC = () => {
     ];
 
     const config = {
-      numParticles: 48,
-      speedBase: 0.4,
-      speedVariance: 0.8,
+      numParticles: 44,
+      speedBase: 0.35,
+      speedVariance: 0.7,
       sizeBase: 14,
-      sizeVariance: 22,
-      colors: ['#ffffff', '#8b949e', '#58a6ff', '#3fb950', '#f0e68c', '#ff7b72'],
+      sizeVariance: 20,
+      colors: isLight 
+        ? ['#0f172a', '#334155', '#2563eb', '#16a34a', '#b45309', '#e11d48']
+        : ['#ffffff', '#8b949e', '#58a6ff', '#3fb950', '#f0e68c', '#ff7b72'],
       rows: 6,
     };
 
@@ -122,11 +127,13 @@ export const TechBackgroundCanvas: React.FC = () => {
 
         this.speed = (config.speedBase + Math.random() * config.speedVariance) * this.direction;
         this.color = config.colors[Math.floor(Math.random() * config.colors.length)];
-        this.opacity = Math.random() * 0.35 + 0.1; // Gentle ambient opacity so it stays in background
+        this.opacity = isLight 
+          ? Math.random() * 0.18 + 0.08
+          : Math.random() * 0.32 + 0.1;
 
         const parallaxFactor = this.size / (config.sizeBase + config.sizeVariance);
         this.speed *= 1 + parallaxFactor;
-        this.opacity += parallaxFactor * 0.15;
+        this.opacity += parallaxFactor * (isLight ? 0.08 : 0.15);
 
         this.angle = Math.random() * Math.PI * 2;
         this.angularSpeed = 0.01 + Math.random() * 0.02;
@@ -160,8 +167,8 @@ export const TechBackgroundCanvas: React.FC = () => {
         }
 
         drawCtx.globalAlpha = this.opacity;
-        drawCtx.shadowBlur = 8;
-        drawCtx.shadowColor = this.color;
+        drawCtx.shadowBlur = isLight ? 3 : 8;
+        drawCtx.shadowColor = isLight ? 'rgba(0,0,0,0.1)' : this.color;
         drawCtx.strokeStyle = this.color;
         drawCtx.fillStyle = this.color;
         drawCtx.lineWidth = 1.4;
@@ -208,7 +215,7 @@ export const TechBackgroundCanvas: React.FC = () => {
       ctx.clearRect(0, 0, width, height);
 
       // Subtle horizontal track lines
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
+      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.025)';
       ctx.lineWidth = 1;
       const rowHeight = height / config.rows;
       for (let r = 1; r < config.rows; r++) {
@@ -233,7 +240,7 @@ export const TechBackgroundCanvas: React.FC = () => {
       cancelAnimationFrame(animationFrameId);
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [isLight]);
 
   return (
     <div

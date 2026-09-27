@@ -37,7 +37,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-neutral-800 selection:text-neutral-100">
+    <div className="relative min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-neutral-800 selection:text-neutral-100 transition-colors duration-250">
       {/* Sticky Navigation */}
       <Navbar activeSection={activeSection} onNavigate={handleNavigate} />
 

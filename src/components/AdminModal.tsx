@@ -224,7 +224,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
               )}
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-neutral-100 text-neutral-950 font-medium text-sm hover:bg-white transition-colors cursor-pointer shadow-sm"
+                className="w-full py-3 rounded-xl bg-neutral-100 text-neutral-950 font-medium text-sm hover:opacity-90 transition-opacity cursor-pointer shadow-sm"
               >
                 Authenticate Dashboard
               </button>
@@ -419,7 +419,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-6 py-2.5 rounded-xl bg-neutral-100 hover:bg-white text-neutral-950 font-medium text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
+                      className="px-6 py-2.5 rounded-xl bg-neutral-100 hover:opacity-90 text-neutral-950 font-medium text-sm transition-opacity cursor-pointer shadow-sm flex items-center gap-2"
                     >
                       {isSubmitting ? (
                         <span>Saving...</span>

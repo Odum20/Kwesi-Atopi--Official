@@ -42,7 +42,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreWork, onContact }) => {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-14">
             <button
               onClick={onExploreWork}
-              className="px-6 py-3.5 rounded-xl bg-neutral-100 text-neutral-950 font-medium text-sm hover:bg-white transition-all duration-200 shadow-sm cursor-pointer flex items-center justify-center gap-2 group"
+              className="px-6 py-3.5 rounded-xl bg-neutral-100 text-neutral-950 font-medium text-sm hover:opacity-90 transition-all duration-200 shadow-sm cursor-pointer flex items-center justify-center gap-2 group"
             >
               <span>View my work</span>
               <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
