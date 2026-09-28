@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Project } from '../types';
 import { X, Github, ExternalLink } from 'lucide-react';
+import { ProjectImage } from './ProjectImage';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -63,15 +64,14 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
               className="group relative block aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner cursor-pointer"
               title={project.liveUrl ? "Visit Live Site" : "View on GitHub"}
             >
-              <img
+              <ProjectImage
                 src={project.image}
                 alt={project.title}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                hoverZoom={true}
               />
 
               {/* Hover overlay with visit link icon */}
-              <div className="absolute inset-0 bg-neutral-950/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+              <div className="absolute inset-0 bg-neutral-950/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center z-10">
                 <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-neutral-950 text-sm font-semibold shadow-2xl transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                   <ExternalLink className="w-4 h-4" />
                   <span>{project.liveUrl ? 'Visit Site' : 'View Code'}</span>
@@ -79,17 +79,16 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
               </div>
 
               {/* Small top-right indicator */}
-              <div className="absolute top-3 right-3 p-2 rounded-lg bg-neutral-950/70 backdrop-blur-md border border-neutral-700/60 text-neutral-300 opacity-90 group-hover:opacity-0 transition-opacity">
+              <div className="absolute top-3 right-3 p-2 rounded-lg bg-neutral-950/70 backdrop-blur-md border border-neutral-700/60 text-neutral-300 opacity-90 group-hover:opacity-0 transition-opacity z-10">
                 <ExternalLink className="w-3.5 h-3.5" />
               </div>
             </a>
           ) : (
             <div className="aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner">
-              <img
+              <ProjectImage
                 src={project.image}
                 alt={project.title}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                hoverZoom={false}
               />
             </div>
           )}

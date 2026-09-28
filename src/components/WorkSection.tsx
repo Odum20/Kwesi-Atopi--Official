@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Project } from '../types';
 import { ArrowUpRight, Github, ExternalLink } from 'lucide-react';
+import { ProjectImage } from './ProjectImage';
 
 interface WorkSectionProps {
   projects: Project[];
@@ -70,16 +71,15 @@ export const WorkSection: React.FC<WorkSectionProps> = ({ projects, onSelectProj
             >
               {/* Thumbnail Container with Image Zoom */}
               <div className="relative aspect-[4/3] overflow-hidden bg-neutral-950">
-                <img
+                <ProjectImage
                   src={project.image}
                   alt={project.title}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  hoverZoom={true}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />
 
                 {/* Floating Year badge / Quick Action */}
-                <div className="absolute top-4 right-4 bg-neutral-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-mono text-neutral-300 border border-neutral-800">
+                <div className="absolute top-4 right-4 bg-neutral-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-mono text-neutral-300 border border-neutral-800 pointer-events-none z-20">
                   {project.year}
                 </div>
               </div>

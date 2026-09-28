@@ -1,6 +1,7 @@
 import React from 'react';
 import { Project } from '../types';
 import { ArrowUpRight, Github, ExternalLink, FlaskConical } from 'lucide-react';
+import { ProjectImage } from './ProjectImage';
 
 interface ExperimentsSectionProps {
   experiments: Project[];
@@ -37,13 +38,13 @@ export const ExperimentsSection: React.FC<ExperimentsSectionProps> = ({ experime
             >
               {/* Thumbnail */}
               <div className="relative aspect-[16/9] overflow-hidden bg-neutral-900">
-                <img
+                <ProjectImage
                   src={experiment.image}
                   alt={experiment.title}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-85"
+                  hoverZoom={true}
+                  imageClassName="opacity-85 group-hover:opacity-100"
                 />
-                <div className="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-mono text-neutral-300 border border-neutral-800">
+                <div className="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-mono text-neutral-300 border border-neutral-800 z-20 pointer-events-none">
                   Experiment
                 </div>
               </div>

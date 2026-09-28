@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowDown, Terminal, Globe, Activity } from 'lucide-react';
 import { TechBackgroundCanvas } from './TechBackgroundCanvas';
+import { ProjectImage } from './ProjectImage';
 
 interface HeroProps {
   onExploreWork: () => void;
@@ -104,11 +105,12 @@ export const Hero: React.FC<HeroProps> = ({ onExploreWork, onContact }) => {
 
             {/* Vertical Image Display Container */}
             <div className="relative w-full bg-neutral-950 flex items-center justify-center p-4">
-              <div className="relative rounded-xl overflow-hidden border border-neutral-800/80 shadow-inner w-full flex justify-center bg-neutral-900/50">
-                <img
+              <div className="relative rounded-xl overflow-hidden border border-neutral-800/80 shadow-inner w-full flex justify-center bg-neutral-900/50 aspect-[4/5] max-h-[520px]">
+                <ProjectImage
                   src="https://res.cloudinary.com/dukipuswv/image/upload/v1790449072/85b8ad62-abb3-405a-9a6f-09880e2e113a_yfttez.png"
                   alt="Kwesi Odum Profile"
-                  className="w-full h-auto max-h-[520px] object-cover object-center group-hover:scale-[1.02] transition-transform duration-500"
+                  hoverZoom={true}
+                  imageClassName="w-full h-full object-cover object-center"
                 />
               </div>
             </div>

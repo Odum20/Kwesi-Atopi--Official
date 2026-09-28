@@ -1,4 +1,8 @@
 import { Project } from '../types';
+import pipelinesImg from '../assets/images/project_automated_pipelines_1790444059910.jpg';
+import fintechImg from '../assets/images/project_automotive_fintech_1790444072712.jpg';
+import enviroImg from '../assets/images/project_environmental_intelligence_1790444085656.jpg';
+import gamesImg from '../assets/images/project_video_games_1790444096168.jpg';
 
 export const projectsData: Project[] = [
   {
@@ -6,7 +10,7 @@ export const projectsData: Project[] = [
     title: 'Automated Pipelines',
     subtitle: 'Zero-downtime ETL workflow orchestration engine',
     description: 'High-throughput distributed pipeline manager supporting real-time stream transformation, automated retry logic, and fault-tolerant state recovery.',
-    image: '/src/assets/images/project_automated_pipelines_1790444059910.jpg',
+    image: pipelinesImg,
     tags: ['SYSTEMS'],
     year: '2026',
     role: 'Lead Systems Architect',
@@ -17,7 +21,7 @@ export const projectsData: Project[] = [
     liveUrl: 'https://pipelines-demo.vercel.app',
     githubUrl: 'https://github.com/Odum20/automated-pipelines',
     screenshots: [
-      '/src/assets/images/project_automated_pipelines_1790444059910.jpg'
+      pipelinesImg
     ],
     isExperiment: false
   },
@@ -26,7 +30,7 @@ export const projectsData: Project[] = [
     title: 'Automotive Fintech',
     subtitle: 'Real-time leasing and asset-backed micro-lending platform',
     description: 'Secure financial telemetry and automated credit underwriting engine built for modern automotive dealerships and digital leasing fleets.',
-    image: '/src/assets/images/project_automotive_fintech_1790444072712.jpg',
+    image: fintechImg,
     tags: ['FINTECH', 'AUTOMOTIVE'],
     year: '2025',
     role: 'Senior Full-Stack Engineer',
@@ -37,7 +41,7 @@ export const projectsData: Project[] = [
     liveUrl: 'https://autofintech.dev',
     githubUrl: 'https://github.com/Odum20/automotive-fintech',
     screenshots: [
-      '/src/assets/images/project_automotive_fintech_1790444072712.jpg'
+      fintechImg
     ],
     isExperiment: false
   },
@@ -46,7 +50,7 @@ export const projectsData: Project[] = [
     title: 'Environmental Intelligence',
     subtitle: 'Satellite telemetry and carbon flux monitoring system',
     description: 'Geospatial analytics platform processing multispectral satellite imagery to track deforestation, air quality indices, and corporate carbon footprints.',
-    image: '/src/assets/images/project_environmental_intelligence_1790444085656.jpg',
+    image: enviroImg,
     tags: ['GIS', 'Sat intel'],
     year: '2025',
     role: 'Creator & Lead Developer',
@@ -57,7 +61,7 @@ export const projectsData: Project[] = [
     liveUrl: 'https://enviro-intel.io',
     githubUrl: 'https://github.com/Odum20/environmental-intelligence',
     screenshots: [
-      '/src/assets/images/project_environmental_intelligence_1790444085656.jpg'
+      enviroImg
     ],
     isExperiment: false
   },
@@ -66,7 +70,7 @@ export const projectsData: Project[] = [
     title: 'Video Games',
     subtitle: 'Browser-based 3D voxel engine and multiplayer sandbox',
     description: 'High-performance WebGL game engine featuring procedural world generation, dynamic lighting, and real-time multiplayer synchronization.',
-    image: '/src/assets/images/project_video_games_1790444096168.jpg',
+    image: gamesImg,
     tags: ['GAMING', '3D'],
     year: '2026',
     role: 'Solo Creator',
@@ -77,7 +81,7 @@ export const projectsData: Project[] = [
     liveUrl: 'https://voxel-sandbox.vercel.app',
     githubUrl: 'https://github.com/Odum20/video-games-engine',
     screenshots: [
-      '/src/assets/images/project_video_games_1790444096168.jpg'
+      gamesImg
     ],
     isExperiment: false
   }
@@ -89,7 +93,7 @@ export const experimentsData: Project[] = [
     title: 'WebAudio Granular Synth',
     subtitle: 'Browser-based real-time audio grain cloud generator',
     description: 'An experimental sound design playground utilizing the Web Audio API and custom DSP worklets for ambient soundscapes.',
-    image: '/src/assets/images/project_video_games_1790444096168.jpg',
+    image: gamesImg,
     tags: ['Audio', 'DSP', 'Experimental'],
     year: '2026',
     role: 'Solo Creator',
@@ -107,7 +111,7 @@ export const experimentsData: Project[] = [
     title: 'Verlet DOM Physics',
     subtitle: 'Lightweight physics engine operating directly on DOM bounding boxes',
     description: 'Gravity, collisions, and elastic constraints applied to standard DOM elements using constraint relaxation.',
-    image: '/src/assets/images/project_automated_pipelines_1790444059910.jpg',
+    image: pipelinesImg,
     tags: ['Physics', 'Animation', 'Toy'],
     year: '2025',
     role: 'Solo Creator',
@@ -125,7 +129,7 @@ export const experimentsData: Project[] = [
     title: 'GLSL Noise Sculptor',
     subtitle: 'Interactive procedural terrain generator powered by fragment shaders',
     description: 'Real-time raymarching shader experiment exploring fractal Brownian motion and atmospheric scattering.',
-    image: '/src/assets/images/project_environmental_intelligence_1790444085656.jpg',
+    image: enviroImg,
     tags: ['WebGL', 'Shaders', 'Graphics'],
     year: '2025',
     role: 'Solo Creator',
@@ -139,4 +143,3 @@ export const experimentsData: Project[] = [
     isExperiment: true
   }
 ];
-
