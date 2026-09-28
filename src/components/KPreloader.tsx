@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 interface KPreloaderProps {
   size?: number;
@@ -9,9 +10,19 @@ interface KPreloaderProps {
 export const KPreloader: React.FC<KPreloaderProps> = ({
   size = 72,
   className = '',
-  isDarkMode = true,
+  isDarkMode,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  
+  let currentTheme = 'dark';
+  try {
+    const themeContext = useTheme();
+    if (themeContext) currentTheme = themeContext.theme;
+  } catch {
+    // Fallback if rendered outside of ThemeProvider
+  }
+
+  const effectiveDarkMode = isDarkMode !== undefined ? isDarkMode : currentTheme !== 'light';
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -87,8 +98,8 @@ export const KPreloader: React.FC<KPreloaderProps> = ({
     const mapX = (x: number) => (x / 100) * logicalWidth;
     const mapY = (y: number) => (y / 100) * logicalHeight;
 
-    const lineColor = isDarkMode ? '#a3a3a3' : '#64748b';
-    const glowColor = isDarkMode ? 'rgba(255, 255, 255, 0.25)' : 'rgba(100, 116, 139, 0.3)';
+    const lineColor = effectiveDarkMode ? '#a3a3a3' : '#52525b';
+    const glowColor = effectiveDarkMode ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.15)';
 
     function drawPath(
       pathData: { x: number; y: number }[],
@@ -158,12 +169,12 @@ export const KPreloader: React.FC<KPreloaderProps> = ({
 
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
-      ctx.shadowBlur = isDarkMode ? 5 : 0;
-      ctx.shadowColor = isDarkMode ? glowColor : 'transparent';
+      ctx.shadowBlur = effectiveDarkMode ? 5 : 0;
+      ctx.shadowColor = effectiveDarkMode ? glowColor : 'transparent';
 
       const outlineProgress = Math.min(1, progress * 1.5);
       if (outlineProgress > 0.3) {
-        ctx.fillStyle = isDarkMode ? 'rgba(30, 30, 30, 0.85)' : 'rgba(220, 220, 220, 0.5)';
+        ctx.fillStyle = effectiveDarkMode ? 'rgba(30, 30, 30, 0.85)' : 'rgba(228, 228, 231, 0.85)';
         ctx.shadowBlur = 0;
         [leftStemPath, topArmPath, bottomArmPath].forEach((path) => {
           ctx.beginPath();
@@ -172,7 +183,7 @@ export const KPreloader: React.FC<KPreloaderProps> = ({
           ctx.closePath();
           ctx.fill();
         });
-        if (isDarkMode) ctx.shadowBlur = 5;
+        if (effectiveDarkMode) ctx.shadowBlur = 5;
       }
 
       drawPath(leftStemPath, outlineProgress, 2, lineColor, true);
@@ -191,8 +202,8 @@ export const KPreloader: React.FC<KPreloaderProps> = ({
 
       const dotProgress = Math.max(0, Math.min(1, (progress - 0.6) * 2));
       if (dotProgress > 0) {
-        ctx.fillStyle = isDarkMode ? '#ffffff' : lineColor;
-        ctx.strokeStyle = isDarkMode ? lineColor : '#ffffff';
+        ctx.fillStyle = effectiveDarkMode ? '#ffffff' : '#18181b';
+        ctx.strokeStyle = effectiveDarkMode ? lineColor : '#71717a';
         ctx.lineWidth = 1;
         dots.forEach((dot) => {
           ctx.beginPath();
@@ -211,7 +222,7 @@ export const KPreloader: React.FC<KPreloaderProps> = ({
     return () => {
       cancelAnimationFrame(animId);
     };
-  }, [size, isDarkMode]);
+  }, [size, effectiveDarkMode]);
 
   return (
     <canvas

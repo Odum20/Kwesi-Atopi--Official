@@ -13,6 +13,7 @@ import { Project } from './types';
 
 export default function App() {
   const [activeSection, setActiveSection] = useState<string>('work');
+  const [selectedTag, setSelectedTag] = useState<string>('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
   const [isAdminButtonVisible, setIsAdminButtonVisible] = useState<boolean>(false);
@@ -53,12 +54,18 @@ export default function App() {
 
         <WorkSection
           projects={projects}
+          experiments={experiments}
+          selectedTag={selectedTag}
+          onSelectTag={setSelectedTag}
           loading={loading}
           onSelectProject={(project) => setSelectedProject(project)}
         />
 
         <ExperimentsSection
           experiments={experiments}
+          projects={projects}
+          selectedTag={selectedTag}
+          onSelectTag={setSelectedTag}
           loading={loading}
           onSelectProject={(exp) => setSelectedProject(exp)}
         />
