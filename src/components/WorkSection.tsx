@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { Project } from '../types';
 import { ArrowUpRight, Github, ExternalLink } from 'lucide-react';
 import { ProjectImage } from './ProjectImage';
+import { KPreloader } from './KPreloader';
 
 interface WorkSectionProps {
   projects: Project[];
+  loading?: boolean;
   onSelectProject: (project: Project) => void;
 }
 
-export const WorkSection: React.FC<WorkSectionProps> = ({ projects, onSelectProject }) => {
+export const WorkSection: React.FC<WorkSectionProps> = ({ projects, loading = false, onSelectProject }) => {
   const [selectedTag, setSelectedTag] = useState<string>('All');
 
   // Ensure GIS and Sat intel are present among the filter buttons, excluding any 'FEATURED' tag
@@ -61,84 +63,100 @@ export const WorkSection: React.FC<WorkSectionProps> = ({ projects, onSelectProj
           </div>
         </div>
 
-        {/* Project Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              onClick={() => onSelectProject(project)}
-              className="group bg-neutral-900/60 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-neutral-700 transition-all duration-300 flex flex-col cursor-pointer"
-            >
-              {/* Thumbnail Container with Image Zoom */}
-              <div className="relative aspect-[4/3] overflow-hidden bg-neutral-950">
-                <ProjectImage
-                  src={project.image}
-                  alt={project.title}
-                  hoverZoom={true}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />
-
-                {/* Floating Year badge / Quick Action */}
-                <div className="absolute top-4 right-4 bg-neutral-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-mono text-neutral-300 border border-neutral-800 pointer-events-none z-20">
-                  {project.year}
-                </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  {/* Zero-Pill Metadata with typographic separators */}
-                  <div className="flex items-center gap-2 text-xs text-neutral-400 mb-3 font-mono">
-                    <span>{project.tags.join(' / ')}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{project.role}</span>
-                  </div>
-
-                  <h3 className="text-xl font-bold text-neutral-100 mb-2 flex items-center justify-between">
-                    <span>{project.title}</span>
-                    <ArrowUpRight className="w-4 h-4 text-neutral-500 group-hover:text-neutral-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                  </h3>
-
-                  <p className="text-sm text-neutral-400 line-clamp-2 leading-relaxed mb-6">
-                    {project.description}
-                  </p>
-                </div>
-
-                {/* Card footer links */}
-                <div className="pt-4 border-t border-neutral-800/60 flex items-center justify-between text-xs font-medium text-neutral-300">
-                  <span className="group-hover:underline flex items-center gap-1">
-                    <span>View project case study</span>
-                  </span>
-
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors"
-                        title="GitHub Repository"
-                      >
-                        <Github className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors"
-                        title="Live Preview"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
+        {/* Project Cards Grid or Section Preloader */}
+        {loading ? (
+          <div className="w-full py-32 rounded-3xl bg-neutral-900/40 border border-neutral-800/80 flex flex-col items-center justify-center gap-4">
+            <KPreloader size={80} isDarkMode={true} />
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-neutral-400 animate-ping" />
+              <span className="text-xs uppercase font-mono tracking-widest text-neutral-400">
+                Syncing Live Worksets...
+              </span>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : filteredProjects.length === 0 ? (
+          <div className="text-center py-20 bg-neutral-900/30 rounded-2xl border border-neutral-800/80">
+            <p className="text-sm font-mono text-neutral-400">No projects found matching this category.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProjects.map((project) => (
+              <div
+                key={project.id}
+                onClick={() => onSelectProject(project)}
+                className="group bg-neutral-900/60 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-neutral-700 transition-all duration-300 flex flex-col cursor-pointer"
+              >
+                {/* Thumbnail Container with Image Zoom */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-neutral-950">
+                  <ProjectImage
+                    src={project.image}
+                    alt={project.title}
+                    hoverZoom={true}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />
+
+                  {/* Floating Year badge / Quick Action */}
+                  <div className="absolute top-4 right-4 bg-neutral-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-mono text-neutral-300 border border-neutral-800 pointer-events-none z-20">
+                    {project.year}
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    {/* Zero-Pill Metadata with typographic separators */}
+                    <div className="flex items-center gap-2 text-xs text-neutral-400 mb-3 font-mono">
+                      <span>{project.tags.join(' / ')}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>{project.role}</span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-neutral-100 mb-2 flex items-center justify-between">
+                      <span>{project.title}</span>
+                      <ArrowUpRight className="w-4 h-4 text-neutral-500 group-hover:text-neutral-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                    </h3>
+
+                    <p className="text-sm text-neutral-400 line-clamp-2 leading-relaxed mb-6">
+                      {project.description}
+                    </p>
+                  </div>
+
+                  {/* Card footer links */}
+                  <div className="pt-4 border-t border-neutral-800/60 flex items-center justify-between text-xs font-medium text-neutral-300">
+                    <span className="group-hover:underline flex items-center gap-1">
+                      <span>View project case study</span>
+                    </span>
+
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors"
+                          title="GitHub Repository"
+                        >
+                          <Github className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors"
+                          title="Live Preview"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

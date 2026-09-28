@@ -55,8 +55,8 @@ function normalizeProject(id: string, data: any): Project {
 }
 
 export function useProjects() {
-  const [projects, setProjects] = useState<Project[]>(projectsData);
-  const [experiments, setExperiments] = useState<Project[]>(experimentsData);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [experiments, setExperiments] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

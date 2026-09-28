@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Lock, Plus, Trash2, Pencil, ShieldCheck, Sparkles, Image, Link as LinkIcon, Tag, Eye, EyeOff } from 'lucide-react';
 import { Project } from '../types';
 import { resolveAssetUrl } from '../lib/resolveAsset';
+import { ProjectImage } from './ProjectImage';
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -346,8 +347,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                     <label className="relative group w-full aspect-square rounded-xl bg-neutral-900 border-2 border-dashed border-neutral-700 hover:border-neutral-500 transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden p-2">
                       {imageUrl ? (
                         <>
-                          <img src={resolveAssetUrl(imageUrl)} alt="Thumbnail preview" className="absolute inset-0 w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-xs text-neutral-200 font-medium">
+                          <div className="absolute inset-0">
+                            <ProjectImage src={imageUrl} alt="Thumbnail preview" hoverZoom={false} />
+                          </div>
+                          <div className="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-xs text-neutral-200 font-medium z-20 pointer-events-none">
                             <Image className="w-6 h-6 mb-1 text-neutral-200" />
                             <span>Click to change image</span>
                           </div>

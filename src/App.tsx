@@ -17,7 +17,7 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
   const [isAdminButtonVisible, setIsAdminButtonVisible] = useState<boolean>(false);
 
-  const { projects, experiments, addProject, updateProject, removeProject } = useProjects();
+  const { projects, experiments, loading, addProject, updateProject, removeProject } = useProjects();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,11 +53,13 @@ export default function App() {
 
         <WorkSection
           projects={projects}
+          loading={loading}
           onSelectProject={(project) => setSelectedProject(project)}
         />
 
         <ExperimentsSection
           experiments={experiments}
+          loading={loading}
           onSelectProject={(exp) => setSelectedProject(exp)}
         />
 
