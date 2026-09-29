@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Linkedin, MessageCircle, Send, CheckCircle2 } from 'lucide-react';
+import { Mail, Linkedin, Instagram, Send, CheckCircle2 } from 'lucide-react';
 import { TikTokIcon } from './TikTokIcon';
 import { SendMessageModal } from './SendMessageModal';
 import { CONTACT_CONFIG } from '../config/contact';
@@ -33,7 +33,7 @@ export const ContactSection: React.FC = () => {
 
   const socialLinks = [
     { label: 'Email', value: CONTACT_CONFIG.email, icon: Mail, href: `mailto:${CONTACT_CONFIG.email}` },
-    { label: 'WhatsApp', value: CONTACT_CONFIG.whatsappDisplay, icon: MessageCircle, href: `https://wa.me/${CONTACT_CONFIG.whatsappNumber}` },
+    { label: 'Instagram', value: CONTACT_CONFIG.instagramHandle, icon: Instagram, href: CONTACT_CONFIG.instagramUrl },
     { label: 'TikTok', value: CONTACT_CONFIG.tiktokHandle, icon: TikTokIcon, href: CONTACT_CONFIG.tiktokUrl },
     { label: 'LinkedIn', value: 'kwesi-atopi-odum-a70a21366', icon: Linkedin, href: CONTACT_CONFIG.linkedinUrl },
   ];

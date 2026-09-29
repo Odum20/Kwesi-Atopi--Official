@@ -1,5 +1,5 @@
 import React from 'react';
-import { Terminal, MessageCircle, Linkedin, Mail } from 'lucide-react';
+import { Terminal, Instagram, Linkedin, Mail } from 'lucide-react';
 import { TikTokIcon } from './TikTokIcon';
 import { CONTACT_CONFIG } from '../config/contact';
 
@@ -21,8 +21,8 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-4 text-neutral-400">
-          <a href={`https://wa.me/${CONTACT_CONFIG.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-100 transition-colors" title={`WhatsApp: ${CONTACT_CONFIG.whatsappDisplay}`}>
-            <MessageCircle className="w-4 h-4" />
+          <a href={CONTACT_CONFIG.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-100 transition-colors" title={`Instagram: ${CONTACT_CONFIG.instagramHandle}`}>
+            <Instagram className="w-4 h-4" />
           </a>
           <a href={CONTACT_CONFIG.tiktokUrl} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-100 transition-colors" title={`TikTok: ${CONTACT_CONFIG.tiktokHandle}`}>
             <TikTokIcon className="w-4 h-4" />
