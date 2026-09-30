@@ -184,7 +184,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
                   {/* Card footer links */}
                   <div className="pt-4 border-t border-neutral-800/60 flex items-center justify-between text-xs font-medium text-neutral-300">
                     <span className="group-hover:underline flex items-center gap-1">
-                      <span>View project case study</span>
+                      <span>View project</span>
                     </span>
 
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>

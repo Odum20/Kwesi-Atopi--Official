@@ -156,7 +156,22 @@ export const ExperimentsSection: React.FC<ExperimentsSectionProps> = ({
                   </div>
 
                   <div className="pt-4 border-t border-neutral-900 flex items-center justify-between text-xs font-medium text-neutral-300">
-                    <span className="group-hover:underline">Explore prototype</span>
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (experiment.liveUrl) {
+                          window.open(experiment.liveUrl, '_blank', 'noopener,noreferrer');
+                        } else if (experiment.githubUrl) {
+                          window.open(experiment.githubUrl, '_blank', 'noopener,noreferrer');
+                        } else {
+                          onSelectProject(experiment);
+                        }
+                      }}
+                      className="group-hover:underline cursor-pointer flex items-center gap-1.5"
+                    >
+                      <span>Explore prototype</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-neutral-500 group-hover:text-neutral-100 transition-colors" />
+                    </span>
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                       {experiment.githubUrl && (
                         <a

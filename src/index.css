@@ -38,5 +38,27 @@ html.light ::selection {
   code, pre, .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
+
+  /* Custom sleek dark scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(10, 10, 10, 0.5);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(82, 82, 91, 0.4);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(113, 113, 122, 0.8);
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(82, 82, 91, 0.4) rgba(10, 10, 10, 0.5);
+  }
 }
 
