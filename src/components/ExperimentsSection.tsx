@@ -39,7 +39,7 @@ export const ExperimentsSection: React.FC<ExperimentsSectionProps> = ({
             </h2>
           </div>
           <p className="max-w-md text-sm text-neutral-400">
-            Unfinished ideas, DSP sound toys, shader sketches, and rapid technical experiments exploring edge capabilities.
+            Early-stage prototypes, and work-in-progress explorations across digital pipelines.
           </p>
         </div>
 
