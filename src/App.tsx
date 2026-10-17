@@ -10,6 +10,7 @@ import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { AdminModal } from './components/AdminModal';
 import { useProjects } from './hooks/useProjects';
 import { useHeroContent } from './hooks/useHeroContent';
+import { DynamicSEO } from './components/DynamicSEO';
 import { Project } from './types';
 
 export default function App() {
@@ -44,6 +45,13 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-neutral-800 selection:text-neutral-100 transition-colors duration-250">
+      {/* Dynamic SEO & Schema.org JSON-LD linked directly to Firestore */}
+      <DynamicSEO
+        projects={projects}
+        experiments={experiments}
+        heroContent={heroContent}
+      />
+
       {/* Sticky Navigation */}
       <Navbar activeSection={activeSection} onNavigate={handleNavigate} />
 

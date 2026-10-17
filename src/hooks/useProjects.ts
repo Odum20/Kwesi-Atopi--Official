@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { collection, onSnapshot, deleteDoc, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Project } from '../types';
-import { projectsData, experimentsData } from '../data/projects';
 
 function cleanObject<T extends Record<string, any>>(obj: T): T {
   const cleaned: any = {};
@@ -88,10 +87,8 @@ export function useProjects() {
           setExperiments(remoteExperiments);
           setError(null);
         } else {
-          // Seed initial data if Firestore is fresh and empty
-          [...projectsData, ...experimentsData].forEach(async (p) => {
-            await setDoc(doc(db, 'projects', p.id), cleanObject(p));
-          });
+          setProjects([]);
+          setExperiments([]);
         }
         setLoading(false);
       },
