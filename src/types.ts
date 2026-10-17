@@ -13,6 +13,7 @@ export interface Project {
   result: string;
   liveUrl?: string;
   githubUrl?: string;
+  videoUrl?: string;
   screenshots: string[];
   isExperiment?: boolean;
 }
@@ -27,3 +28,11 @@ export interface BlogPost {
   tags: string[];
   slug: string;
 }
+
+export interface HeroContent {
+  tagline: string;
+  description: string;
+  badge?: string;
+  updatedAt?: string;
+}
+

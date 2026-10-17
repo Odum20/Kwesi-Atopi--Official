@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, Plus, Trash2, Pencil, ShieldCheck, Sparkles, Image, Link as LinkIcon, Tag, Eye, EyeOff } from 'lucide-react';
-import { Project } from '../types';
+import {
+  X,
+  Lock,
+  Plus,
+  Trash2,
+  Pencil,
+  ShieldCheck,
+  Sparkles,
+  Image,
+  Eye,
+  EyeOff,
+  Type,
+  RotateCcw,
+  Briefcase
+} from 'lucide-react';
+import { Project, HeroContent } from '../types';
 import { resolveAssetUrl } from '../lib/resolveAsset';
 import { ProjectImage } from './ProjectImage';
 
@@ -12,6 +26,9 @@ interface AdminModalProps {
   onAddProject: (project: Omit<Project, 'id'>) => Promise<void>;
   onUpdateProject: (id: string, project: Omit<Project, 'id'>) => Promise<void>;
   onDeleteProject: (id: string) => Promise<void>;
+  heroContent: HeroContent;
+  onUpdateHeroContent: (content: Partial<HeroContent>) => Promise<void>;
+  onResetHeroContent: () => Promise<void>;
 }
 
 export const AdminModal: React.FC<AdminModalProps> = ({
@@ -21,37 +38,58 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   experiments,
   onAddProject,
   onUpdateProject,
-  onDeleteProject
+  onDeleteProject,
+  heroContent,
+  onUpdateHeroContent,
+  onResetHeroContent,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'works' | 'hero'>('works');
 
-  // Form state
+  // Work form state
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [liveUrl, setLiveUrl] = useState('');
   const [githubUrl, setGithubUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [selectedTag, setSelectedTag] = useState('SYSTEMS');
   const [isExperiment, setIsExperiment] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [itemToDelete, setItemToDelete] = useState<Project | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Hero form state
+  const [heroTagline, setHeroTagline] = useState(heroContent.tagline);
+  const [heroDescription, setHeroDescription] = useState(heroContent.description);
+  const [heroBadge, setHeroBadge] = useState(heroContent.badge || 'Digital Workspace & Engineering Portfolio');
+  const [isSavingHero, setIsSavingHero] = useState(false);
+  const [isResettingHero, setIsResettingHero] = useState(false);
+
+  useEffect(() => {
+    if (heroContent) {
+      setHeroTagline(heroContent.tagline);
+      setHeroDescription(heroContent.description);
+      setHeroBadge(heroContent.badge || 'Digital Workspace & Engineering Portfolio');
+    }
+  }, [heroContent]);
 
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage(null);
-      }, 3000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
 
   const handleStartEdit = (item: Project) => {
+    setActiveTab('works');
     setEditingProjectId(item.id);
     setTitle(item.title);
     setSubtitle(item.subtitle);
@@ -59,6 +97,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     setImageUrl(item.image);
     setLiveUrl(item.liveUrl || '');
     setGithubUrl(item.githubUrl || '');
+    setVideoUrl(item.videoUrl || '');
     setSelectedTag(item.tags[0] || 'SYSTEMS');
     setIsExperiment(!!item.isExperiment);
   };
@@ -71,6 +110,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     setImageUrl('');
     setLiveUrl('');
     setGithubUrl('');
+    setVideoUrl('');
     setSelectedTag('SYSTEMS');
     setIsExperiment(false);
   };
@@ -164,6 +204,9 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       if (githubUrl.trim()) {
         projectData.githubUrl = githubUrl.trim();
       }
+      if (videoUrl.trim()) {
+        projectData.videoUrl = videoUrl.trim();
+      }
 
       if (editingProjectId) {
         await onUpdateProject(editingProjectId, projectData);
@@ -182,6 +225,43 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     }
   };
 
+  const handlePublishHero = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!heroTagline.trim() || !heroDescription.trim()) {
+      alert('Please fill in both the tagline and description.');
+      return;
+    }
+
+    setIsSavingHero(true);
+    try {
+      await onUpdateHeroContent({
+        tagline: heroTagline.trim(),
+        description: heroDescription.trim(),
+        badge: heroBadge.trim(),
+      });
+      setSuccessMessage('Hero statements successfully published to Google Cloud! Front view is synced in real time.');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to publish hero statements to Firestore.');
+    } finally {
+      setIsSavingHero(false);
+    }
+  };
+
+  const handleResetHero = async () => {
+    if (!confirm('Are you sure you want to revert Hero statements to default?')) return;
+    setIsResettingHero(true);
+    try {
+      await onResetHeroContent();
+      setSuccessMessage('Hero statements reset to defaults and synced live.');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to reset hero statements.');
+    } finally {
+      setIsResettingHero(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/80 backdrop-blur-md p-4 overflow-y-auto">
       <div className="relative w-full max-w-4xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden my-8">
@@ -196,7 +276,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-neutral-400 hover:text-neutral-100 rounded-lg hover:bg-neutral-800 transition-colors"
+            className="p-1.5 text-neutral-400 hover:text-neutral-100 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -250,250 +330,437 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           </div>
         ) : (
           /* Authenticated Dashboard */
-          <div className="p-6 md:p-8 max-h-[80vh] overflow-y-auto space-y-6">
-            
-            {/* Success Notification Banner */}
-            {successMessage && (
-              <div className="flex items-center justify-between p-4 rounded-xl bg-[#0c3016] border border-[#0c3016] text-white text-sm shadow-xl animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-neutral-900/60 border border-neutral-700/60 flex items-center justify-center text-neutral-100">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-white">Published to Public View</div>
-                    <div className="text-xs text-neutral-300">{successMessage}</div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSuccessMessage(null)}
-                  className="p-1.5 text-neutral-300 hover:text-white rounded-lg hover:bg-neutral-900/40 transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
+          <div>
+            {/* Top Navigation Tabs */}
+            <div className="flex border-b border-neutral-800 bg-neutral-950/70 px-6">
+              <button
+                type="button"
+                onClick={() => setActiveTab('works')}
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-mono font-medium border-b-2 transition-all cursor-pointer ${
+                  activeTab === 'works'
+                    ? 'border-neutral-100 text-neutral-100'
+                    : 'border-transparent text-neutral-400 hover:text-neutral-200'
+                }`}
+              >
+                <Briefcase className="w-3.5 h-3.5" />
+                <span>Projects & Experiments ({projects.length + experiments.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('hero')}
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-mono font-medium border-b-2 transition-all cursor-pointer ${
+                  activeTab === 'hero'
+                    ? 'border-neutral-100 text-neutral-100'
+                    : 'border-transparent text-neutral-400 hover:text-neutral-200'
+                }`}
+              >
+                <Type className="w-3.5 h-3.5" />
+                <span>Hero & Site Statements</span>
+              </button>
+            </div>
 
-            {/* Post New Work Form */}
-            <div className="p-6 rounded-xl bg-neutral-950 border border-neutral-800">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-neutral-100 flex items-center gap-2.5">
-                  {editingProjectId ? (
-                    <>
-                      <div className="p-1 rounded-md bg-[#0c3016] text-neutral-200">
-                        <Pencil className="w-3.5 h-3.5" />
-                      </div>
-                      <span>Editing Work: <span className="text-neutral-300 font-normal">{title}</span></span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="p-1 rounded-md bg-[#0c3016] text-neutral-200">
-                        <Plus className="w-3.5 h-3.5" />
-                      </div>
-                      <span>Post New Work to Cloud</span>
-                    </>
-                  )}
-                </h3>
-                {editingProjectId && (
+            <div className="p-6 md:p-8 max-h-[75vh] overflow-y-auto space-y-6">
+              
+              {/* Success Notification Banner */}
+              {successMessage && (
+                <div className="flex items-center justify-between p-4 rounded-xl bg-[#0c3016] border border-[#0c3016] text-white text-sm shadow-xl animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-neutral-900/60 border border-neutral-700/60 flex items-center justify-center text-neutral-100">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">Cloud Synchronized</div>
+                      <div className="text-xs text-neutral-300">{successMessage}</div>
+                    </div>
+                  </div>
                   <button
-                    type="button"
-                    onClick={handleCancelEdit}
-                    className="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-medium transition-colors cursor-pointer border border-neutral-700"
+                    onClick={() => setSuccessMessage(null)}
+                    className="p-1.5 text-neutral-300 hover:text-white rounded-lg hover:bg-neutral-900/40 transition-colors cursor-pointer"
                   >
-                    Cancel Edit
+                    <X className="w-4 h-4" />
                   </button>
-                )}
-              </div>
-
-              <form onSubmit={handleSubmitNewWork} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Project Title</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Neural Network Visualizer"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Subtitle / Tagline</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Real-time GPU transformer inference"
-                      value={subtitle}
-                      onChange={(e) => setSubtitle(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
-                    />
-                  </div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Description</label>
-                  <textarea
-                    rows={3}
-                    placeholder="Describe the architecture, problem solved, and impact..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600 resize-none"
-                  />
-                </div>
+              {/* TAB 1: HERO & SITE COPY CONFIGURATION */}
+              {activeTab === 'hero' && (
+                <div className="space-y-6">
+                  {/* Explanatory Banner */}
+                  <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800">
+                    <div className="flex items-center gap-2 text-xs font-mono text-neutral-300 uppercase tracking-wider mb-1">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Live Site Copy & Statements</span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                      Configure your headline statement and supporting bio without touching code. Everything publishes directly to Google Cloud Firestore and syncs live across all sessions.
+                    </p>
+                  </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                  {/* Square Image Upload Dropzone */}
-                  <div className="md:col-span-4 flex flex-col items-center">
-                    <label className="w-full block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">Thumbnail Image (Square)</label>
-                    <label className="relative group w-full aspect-square rounded-xl bg-neutral-900 border-2 border-dashed border-neutral-700 hover:border-neutral-500 transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden p-2">
-                      {imageUrl ? (
-                        <>
-                          <div className="absolute inset-0">
-                            <ProjectImage src={imageUrl} alt="Thumbnail preview" hoverZoom={false} />
-                          </div>
-                          <div className="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-xs text-neutral-200 font-medium z-20 pointer-events-none">
-                            <Image className="w-6 h-6 mb-1 text-neutral-200" />
-                            <span>Click to change image</span>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-center p-4">
-                          <div className="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center mx-auto mb-2 text-neutral-300 group-hover:text-white transition-colors">
-                            <Image className="w-5 h-5 text-neutral-300" />
-                          </div>
-                          <span className="text-xs font-medium text-neutral-300 block mb-0.5">Click to upload</span>
-                          <span className="text-[10px] text-neutral-500 block">PNG, JPG, WebP from device</span>
+                  <form onSubmit={handlePublishHero} className="space-y-5">
+                    {/* Hero Tagline */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-mono uppercase tracking-wider text-neutral-300 font-medium">
+                          Hero Tagline / Core Statement
+                        </label>
+                        <span className="text-[11px] font-mono text-neutral-500">Rendered under your name</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={heroTagline}
+                        onChange={(e) => setHeroTagline(e.target.value)}
+                        placeholder="I build things."
+                        required
+                        className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-none focus:border-neutral-600 text-sm font-sans"
+                      />
+                    </div>
+
+                    {/* Hero Description */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-mono uppercase tracking-wider text-neutral-300 font-medium">
+                          Hero Description / Bio Statement
+                        </label>
+                        <span className="text-[11px] font-mono text-neutral-500">Supporting narrative paragraph</span>
+                      </div>
+                      <textarea
+                        rows={4}
+                        value={heroDescription}
+                        onChange={(e) => setHeroDescription(e.target.value)}
+                        placeholder="Projects, experiments, and production-grade systems. Crafting high-performance software, distributed pipelines, and immersive digital interfaces from Kumasi, Ghana."
+                        required
+                        className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-none focus:border-neutral-600 text-sm leading-relaxed font-sans resize-none"
+                      />
+                    </div>
+
+                    {/* Top Kicker Badge */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-mono uppercase tracking-wider text-neutral-300 font-medium">
+                          Top Terminal Badge Text
+                        </label>
+                        <span className="text-[11px] font-mono text-neutral-500">Badge shown at the top of the hero</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={heroBadge}
+                        onChange={(e) => setHeroBadge(e.target.value)}
+                        placeholder="Digital Workspace & Engineering Portfolio"
+                        className="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-none focus:border-neutral-600 text-sm font-mono"
+                      />
+                    </div>
+
+                    {/* Real-time Preview Widget */}
+                    <div className="p-5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+                      <div className="text-[11px] font-mono uppercase tracking-wider text-neutral-500 flex items-center justify-between">
+                        <span>Live Visual Preview</span>
+                        <span className="text-emerald-400 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>Syncing with input</span>
+                        </span>
+                      </div>
+                      <div className="p-5 rounded-lg bg-neutral-900/60 border border-neutral-800/80 space-y-3">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-950 border border-neutral-800 text-[11px] text-neutral-300 font-mono">
+                          <span>&gt;_</span>
+                          <span>{heroBadge || 'Digital Workspace & Engineering Portfolio'}</span>
                         </div>
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageFileChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
+                        <div className="text-3xl font-bold text-neutral-100 font-sans tracking-tight">
+                          Kwesi Odum
+                        </div>
+                        <div className="text-xl font-medium text-neutral-200 font-sans">
+                          {heroTagline || 'I build things.'}
+                        </div>
+                        <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans max-w-xl">
+                          {heroDescription || 'Projects, experiments, and production-grade systems...'}
+                        </p>
+                      </div>
+                    </div>
 
-                  {/* URLs Column */}
-                  <div className="md:col-span-8 space-y-4">
-                    <div>
-                      <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Live Demo URL</label>
-                      <input
-                        type="url"
-                        placeholder="https://yourproject.vercel.app"
-                        value={liveUrl}
-                        onChange={(e) => setLiveUrl(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
-                      />
+                    {/* Actions */}
+                    <div className="flex items-center justify-between pt-3 border-t border-neutral-800">
+                      <button
+                        type="button"
+                        disabled={isResettingHero || isSavingHero}
+                        onClick={handleResetHero}
+                        className="px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-neutral-200 text-xs font-medium border border-neutral-800 transition-colors cursor-pointer flex items-center gap-2"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Revert to Default</span>
+                      </button>
+
+                      <button
+                        type="submit"
+                        disabled={isSavingHero || isResettingHero}
+                        className="px-6 py-2.5 rounded-xl bg-neutral-100 text-neutral-950 font-medium text-xs hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-2 shadow-sm disabled:opacity-50"
+                      >
+                        {isSavingHero ? (
+                          <>
+                            <span className="w-3.5 h-3.5 border-2 border-neutral-950 border-t-transparent rounded-full animate-spin" />
+                            <span>Publishing to Cloud...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-3.5 h-3.5 text-neutral-950" />
+                            <span>Publish Statements Live</span>
+                          </>
+                        )}
+                      </button>
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">GitHub URL</label>
-                      <input
-                        type="url"
-                        placeholder="https://github.com/Odum20/repo"
-                        value={githubUrl}
-                        onChange={(e) => setGithubUrl(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Or Paste Image URL (Optional)</label>
-                      <input
-                        type="url"
-                        placeholder="https://images.unsplash.com/..."
-                        value={imageUrl.startsWith('data:') ? '' : imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
-                      />
-                    </div>
-                  </div>
+                  </form>
                 </div>
+              )}
 
-                <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5">Select Tag / Category</label>
-                    <div className="flex flex-wrap gap-2">
-                      {availableTags.map((tag) => (
+              {/* TAB 2: PROJECTS & EXPERIMENTS */}
+              {activeTab === 'works' && (
+                <>
+                  {/* Post New Work Form */}
+                  <div className="p-6 rounded-xl bg-neutral-950 border border-neutral-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-neutral-100 flex items-center gap-2.5">
+                        {editingProjectId ? (
+                          <>
+                            <div className="p-1 rounded-md bg-[#0c3016] text-neutral-200">
+                              <Pencil className="w-3.5 h-3.5" />
+                            </div>
+                            <span>Editing Work: <span className="text-neutral-300 font-normal">{title}</span></span>
+                          </>
+                        ) : (
+                          <>
+                            <div className="p-1 rounded-md bg-[#0c3016] text-neutral-200">
+                              <Plus className="w-3.5 h-3.5" />
+                            </div>
+                            <span>Post New Work to Cloud</span>
+                          </>
+                        )}
+                      </h3>
+                      {editingProjectId && (
                         <button
-                          key={tag}
                           type="button"
-                          onClick={() => setSelectedTag(tag)}
-                          className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${selectedTag === tag ? 'bg-neutral-100 text-neutral-950 font-semibold' : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-neutral-200'}`}
+                          onClick={handleCancelEdit}
+                          className="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-medium transition-colors cursor-pointer border border-neutral-700"
                         >
-                          {tag}
+                          Cancel Edit
                         </button>
+                      )}
+                    </div>
+
+                    <form onSubmit={handleSubmitNewWork} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Project Title</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. Neural Network Visualizer"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Subtitle / Tagline</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Real-time GPU transformer inference"
+                            value={subtitle}
+                            onChange={(e) => setSubtitle(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Description</label>
+                        <textarea
+                          rows={3}
+                          placeholder="Describe the architecture, problem solved, and impact..."
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600 resize-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                        {/* Square Image Upload Dropzone */}
+                        <div className="md:col-span-4 flex flex-col items-center">
+                          <label className="w-full block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">Thumbnail Image (Square)</label>
+                          <label className="relative group w-full aspect-square rounded-xl bg-neutral-900 border-2 border-dashed border-neutral-700 hover:border-neutral-500 transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden p-2">
+                            {imageUrl ? (
+                              <>
+                                <div className="absolute inset-0">
+                                  <ProjectImage src={imageUrl} alt="Thumbnail preview" hoverZoom={false} />
+                                </div>
+                                <div className="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-xs text-neutral-200 font-medium z-20 pointer-events-none">
+                                  <Image className="w-6 h-6 mb-1 text-neutral-200" />
+                                  <span>Click to change image</span>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="text-center p-4">
+                                <div className="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center mx-auto mb-2 text-neutral-300 group-hover:text-white transition-colors">
+                                  <Image className="w-5 h-5 text-neutral-300" />
+                                </div>
+                                <span className="text-xs font-medium text-neutral-300 block mb-0.5">Click to upload</span>
+                                <span className="text-[10px] text-neutral-500 block">PNG, JPG, WebP from device</span>
+                              </div>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageFileChange}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+
+                        {/* URLs Column */}
+                        <div className="md:col-span-8 space-y-4">
+                          <div>
+                            <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Live Demo URL</label>
+                            <input
+                              type="url"
+                              placeholder="https://yourproject.vercel.app"
+                              value={liveUrl}
+                              onChange={(e) => setLiveUrl(e.target.value)}
+                              className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">GitHub URL</label>
+                            <input
+                              type="url"
+                              placeholder="https://github.com/Odum20/repo"
+                              value={githubUrl}
+                              onChange={(e) => setGithubUrl(e.target.value)}
+                              className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Or Paste Image URL (Optional)</label>
+                            <input
+                              type="url"
+                              placeholder="https://images.unsplash.com/..."
+                              value={imageUrl.startsWith('data:') ? '' : imageUrl}
+                              onChange={(e) => setImageUrl(e.target.value)}
+                              className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600"
+                            />
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                                Video Preview URL (Optional - MP4 / WebM)
+                              </label>
+                              <span className="text-[10px] font-mono text-emerald-400 font-medium">Hybrid Motion</span>
+                            </div>
+                            <input
+                              type="url"
+                              placeholder="https://res.cloudinary.com/.../preview.mp4"
+                              value={videoUrl}
+                              onChange={(e) => setVideoUrl(e.target.value)}
+                              className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600 font-mono"
+                            />
+                            <p className="text-[10px] text-neutral-500 mt-1">
+                              Direct video link (Cloudinary, GitHub release, Imgur). Enables silent hover looping on cards & central play/pause when opened.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5">Select Tag / Category</label>
+                          <div className="flex flex-wrap gap-2">
+                            {availableTags.map((tag) => (
+                              <button
+                                key={tag}
+                                type="button"
+                                onClick={() => setSelectedTag(tag)}
+                                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                                  selectedTag === tag
+                                    ? 'bg-neutral-100 text-neutral-950 font-semibold'
+                                    : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-neutral-200'
+                                }`}
+                              >
+                                {tag}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={isExperiment}
+                              onChange={(e) => setIsExperiment(e.target.checked)}
+                              className="rounded bg-neutral-900 border-neutral-700 text-neutral-100 focus:ring-0"
+                            />
+                            <span>Post as Experiment</span>
+                          </label>
+
+                          <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="px-6 py-2.5 rounded-xl bg-neutral-100 hover:opacity-90 text-neutral-950 font-medium text-sm transition-opacity cursor-pointer shadow-sm flex items-center gap-2"
+                          >
+                            {isSubmitting ? (
+                              <span>Saving...</span>
+                            ) : editingProjectId ? (
+                              <>
+                                <Pencil className="w-4 h-4 text-neutral-950" />
+                                <span>Update Work Live</span>
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 text-neutral-950" />
+                                <span>Post Work Live</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* Manage Existing Works */}
+                  <div>
+                    <h3 className="text-base font-semibold text-neutral-100 mb-4">
+                      Manage Published Works ({projects.length + experiments.length})
+                    </h3>
+                    <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                      {[...projects, ...experiments].map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-950 border border-neutral-800">
+                          <div className="flex items-center gap-3">
+                            <img src={resolveAssetUrl(item.image)} alt={item.title} className="w-10 h-10 rounded-lg object-cover bg-neutral-900" />
+                            <div>
+                              <div className="text-sm font-medium text-neutral-200">{item.title}</div>
+                              <div className="text-xs text-neutral-400">{item.tags.join(', ')} {item.isExperiment && '• Experiment'}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleStartEdit(item)}
+                              className="p-2 text-neutral-400 hover:text-neutral-100 hover:bg-neutral-900 rounded-lg transition-colors cursor-pointer"
+                              title="Edit Project"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setItemToDelete(item)}
+                              className="p-2 text-red-400 hover:text-red-300 hover:bg-neutral-900 rounded-lg transition-colors cursor-pointer"
+                              title="Delete Project"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
+                </>
+              )}
 
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={isExperiment}
-                        onChange={(e) => setIsExperiment(e.target.checked)}
-                        className="rounded bg-neutral-900 border-neutral-700 text-neutral-100 focus:ring-0"
-                      />
-                      <span>Post as Experiment</span>
-                    </label>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="px-6 py-2.5 rounded-xl bg-neutral-100 hover:opacity-90 text-neutral-950 font-medium text-sm transition-opacity cursor-pointer shadow-sm flex items-center gap-2"
-                    >
-                      {isSubmitting ? (
-                        <span>Saving...</span>
-                      ) : editingProjectId ? (
-                        <>
-                          <Pencil className="w-4 h-4 text-neutral-950" />
-                          <span>Update Work Live</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4" />
-                          <span>Post Work Live</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </form>
             </div>
-
-            {/* Manage Existing Works */}
-            <div>
-              <h3 className="text-base font-semibold text-neutral-100 mb-4">Manage Published Works ({projects.length + experiments.length})</h3>
-              <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                {[...projects, ...experiments].map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-950 border border-neutral-800">
-                    <div className="flex items-center gap-3">
-                      <img src={resolveAssetUrl(item.image)} alt={item.title} className="w-10 h-10 rounded-lg object-cover bg-neutral-900" />
-                      <div>
-                        <div className="text-sm font-medium text-neutral-200">{item.title}</div>
-                        <div className="text-xs text-neutral-400">{item.tags.join(', ')} {item.isExperiment && '• Experiment'}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleStartEdit(item)}
-                        className="p-2 text-neutral-400 hover:text-neutral-100 hover:bg-neutral-900 rounded-lg transition-colors cursor-pointer"
-                        title="Edit Project"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setItemToDelete(item)}
-                        className="p-2 text-red-400 hover:text-red-300 hover:bg-neutral-900 rounded-lg transition-colors cursor-pointer"
-                        title="Delete Project"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
           </div>
         )}
 

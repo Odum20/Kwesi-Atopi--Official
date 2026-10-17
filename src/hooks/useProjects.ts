@@ -49,6 +49,7 @@ function normalizeProject(id: string, data: any): Project {
     result: data.result || '',
     liveUrl: data.liveUrl?.trim() || undefined,
     githubUrl: data.githubUrl?.trim() || undefined,
+    videoUrl: data.videoUrl?.trim() || undefined,
     screenshots,
     isExperiment: Boolean(data.isExperiment)
   };

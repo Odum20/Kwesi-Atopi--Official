@@ -9,6 +9,7 @@ import { Footer } from './components/Footer';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { AdminModal } from './components/AdminModal';
 import { useProjects } from './hooks/useProjects';
+import { useHeroContent } from './hooks/useHeroContent';
 import { Project } from './types';
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
   const [isAdminButtonVisible, setIsAdminButtonVisible] = useState<boolean>(false);
 
   const { projects, experiments, loading, addProject, updateProject, removeProject } = useProjects();
+  const { heroContent, updateHeroContent, resetHeroContent } = useHeroContent();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -50,6 +52,9 @@ export default function App() {
         <Hero
           onExploreWork={() => handleNavigate('work')}
           onContact={() => handleNavigate('contact')}
+          tagline={heroContent.tagline}
+          description={heroContent.description}
+          badge={heroContent.badge}
         />
 
         <WorkSection
@@ -113,6 +118,9 @@ export default function App() {
         onAddProject={addProject}
         onUpdateProject={updateProject}
         onDeleteProject={removeProject}
+        heroContent={heroContent}
+        onUpdateHeroContent={updateHeroContent}
+        onResetHeroContent={resetHeroContent}
       />
     </div>
   );

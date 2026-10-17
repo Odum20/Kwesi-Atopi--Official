@@ -6,9 +6,18 @@ import { ProjectImage } from './ProjectImage';
 interface HeroProps {
   onExploreWork: () => void;
   onContact: () => void;
+  tagline?: string;
+  description?: string;
+  badge?: string;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onExploreWork, onContact }) => {
+export const Hero: React.FC<HeroProps> = ({
+  onExploreWork,
+  onContact,
+  tagline = 'I build things.',
+  description = 'Projects, experiments, and production-grade systems. Crafting high-performance software, distributed pipelines, and immersive digital interfaces from Kumasi, Ghana.',
+  badge = 'Digital Workspace & Engineering Portfolio',
+}) => {
   return (
     <section className="relative min-h-[92vh] flex items-center pt-32 pb-24 px-6 md:px-16 lg:px-24 w-full overflow-hidden">
       {/* Background Animated Developer Icons Canvas */}
@@ -21,7 +30,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreWork, onContact }) => {
           {/* Kicker badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 mb-8">
             <Terminal className="w-3.5 h-3.5 text-neutral-300" />
-            <span>Digital Workspace & Engineering Portfolio</span>
+            <span>{badge}</span>
           </div>
 
           {/* Main Name / Title */}
@@ -31,12 +40,12 @@ export const Hero: React.FC<HeroProps> = ({ onExploreWork, onContact }) => {
 
           {/* Core statement */}
           <p className="text-2xl sm:text-3xl font-medium text-neutral-300 tracking-tight mb-6 font-sans">
-            I build things.
+            {tagline}
           </p>
 
           {/* Supporting text / Biography */}
           <p className="text-base sm:text-lg text-neutral-400 mb-10 leading-relaxed font-sans max-w-2xl">
-            Projects, experiments, and production-grade systems. Crafting high-performance software, distributed pipelines, and immersive digital interfaces from Kumasi, Ghana.
+            {description}
           </p>
 
           {/* Buttons */}

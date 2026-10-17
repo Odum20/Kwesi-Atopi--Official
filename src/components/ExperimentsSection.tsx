@@ -2,6 +2,7 @@ import React from 'react';
 import { Project } from '../types';
 import { ArrowUpRight, Github, ExternalLink, ArrowUp, RotateCcw } from 'lucide-react';
 import { ProjectImage } from './ProjectImage';
+import { HybridMedia } from './HybridMedia';
 import { KPreloader } from './KPreloader';
 import { matchesProjectTag } from '../lib/tagFilter';
 
@@ -112,11 +113,13 @@ export const ExperimentsSection: React.FC<ExperimentsSectionProps> = ({
                 onClick={() => onSelectProject(experiment)}
                 className="group bg-neutral-950 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-neutral-700 transition-all duration-300 flex flex-col cursor-pointer"
               >
-                {/* Thumbnail */}
+                {/* Thumbnail Container with Hybrid Motion */}
                 <div className="relative aspect-[16/9] overflow-hidden bg-neutral-900">
-                  <ProjectImage
+                  <HybridMedia
                     src={experiment.image}
+                    videoUrl={experiment.videoUrl}
                     alt={experiment.title}
+                    mode="card"
                     hoverZoom={true}
                     imageClassName="opacity-85 group-hover:opacity-100"
                   />

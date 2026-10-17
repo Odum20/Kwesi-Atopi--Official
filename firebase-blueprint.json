@@ -10,16 +10,33 @@
         "description": { "type": "string" },
         "imageUrl": { "type": "string" },
         "projectUrl": { "type": "string" },
+        "videoUrl": { "type": "string" },
         "tag": { "type": "string" },
         "createdAt": { "type": "string" }
       },
       "required": ["id", "title", "description", "imageUrl", "projectUrl", "tag"]
+    },
+    "HeroContent": {
+      "title": "HeroContent",
+      "description": "Configurable hero section tagline, bio description, and badge",
+      "type": "object",
+      "properties": {
+        "tagline": { "type": "string" },
+        "description": { "type": "string" },
+        "badge": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["tagline", "description"]
     }
   },
   "firestore": {
     "/projects/{projectId}": {
       "schema": { "$ref": "#/entities/Project" },
       "description": "Collection of portfolio projects and works visible to all visitors"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/HeroContent" },
+      "description": "Global portfolio configuration such as hero texts and taglines"
     }
   }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Project } from '../types';
 import { ArrowUpRight, Github, ExternalLink, ArrowDown, RotateCcw } from 'lucide-react';
 import { ProjectImage } from './ProjectImage';
+import { HybridMedia } from './HybridMedia';
 import { KPreloader } from './KPreloader';
 import { matchesProjectTag } from '../lib/tagFilter';
 
@@ -133,11 +134,13 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
                 onClick={() => onSelectProject(project)}
                 className="group bg-neutral-900/60 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-neutral-700 transition-all duration-300 flex flex-col cursor-pointer"
               >
-                {/* Thumbnail Container with Image Zoom */}
+                {/* Thumbnail Container with Image & Hybrid Motion */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-neutral-950">
-                  <ProjectImage
+                  <HybridMedia
                     src={project.image}
+                    videoUrl={project.videoUrl}
                     alt={project.title}
+                    mode="card"
                     hoverZoom={true}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />

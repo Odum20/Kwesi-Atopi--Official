@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Project } from '../types';
 import { X, Github, ExternalLink } from 'lucide-react';
 import { ProjectImage } from './ProjectImage';
+import { HybridMedia } from './HybridMedia';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -55,43 +56,30 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
 
         {/* Modal Body */}
         <div className="overflow-y-auto p-6 sm:p-8 space-y-6">
-          {/* Clear Picture / Thumbnail with Visit Link on Hover */}
-          {targetVisitUrl ? (
-            <a
-              href={targetVisitUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative block aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner cursor-pointer"
-              title={project.liveUrl ? "Visit Live Site" : "View on GitHub"}
-            >
-              <ProjectImage
-                src={project.image}
-                alt={project.title}
-                hoverZoom={true}
-              />
+          {/* Main Visual / Video Hybrid Motion Container */}
+          <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner group">
+            <HybridMedia
+              src={project.image}
+              videoUrl={project.videoUrl}
+              alt={project.title}
+              mode="modal"
+            />
 
-              {/* Hover overlay with visit link icon */}
-              <div className="absolute inset-0 bg-neutral-950/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center z-10">
-                <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-neutral-950 text-sm font-semibold shadow-2xl transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                  <ExternalLink className="w-4 h-4" />
-                  <span>{project.liveUrl ? 'Visit Site' : 'View Code'}</span>
-                </div>
-              </div>
-
-              {/* Small top-right indicator */}
-              <div className="absolute top-3 right-3 p-2 rounded-lg bg-neutral-950/70 backdrop-blur-md border border-neutral-700/60 text-neutral-300 opacity-90 group-hover:opacity-0 transition-opacity z-10">
+            {/* Quick Visit Site Pill button floating at top right if link exists */}
+            {targetVisitUrl && (
+              <a
+                href={targetVisitUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-3 right-3 z-30 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-950/80 hover:bg-neutral-900 border border-neutral-700/80 text-xs font-medium text-neutral-200 backdrop-blur-md shadow-lg transition-all hover:scale-105 cursor-pointer"
+                title={project.liveUrl ? "Visit Live Site" : "View Code on GitHub"}
+              >
+                <span>{project.liveUrl ? 'Visit Site' : 'View Code'}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
-              </div>
-            </a>
-          ) : (
-            <div className="aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner">
-              <ProjectImage
-                src={project.image}
-                alt={project.title}
-                hoverZoom={false}
-              />
-            </div>
-          )}
+              </a>
+            )}
+          </div>
 
           {/* Title & Subtitle */}
           <div>
