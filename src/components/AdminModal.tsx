@@ -648,19 +648,19 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                           <div>
                             <div className="flex items-center justify-between mb-1">
                               <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                                Video Preview URL (Optional - MP4 / WebM)
+                                Video URL (Optional — MP4, WebM, or YouTube)
                               </label>
-                              <span className="text-[10px] font-mono text-emerald-400 font-medium">Hybrid Motion</span>
+                              <span className="text-[10px] font-mono text-emerald-400 font-medium">Smart Player + Plan B</span>
                             </div>
                             <input
                               type="url"
-                              placeholder="https://res.cloudinary.com/.../preview.mp4"
+                              placeholder="https://youtu.be/... or https://res.cloudinary.com/.../video.mp4"
                               value={videoUrl}
                               onChange={(e) => setVideoUrl(e.target.value)}
                               className="w-full px-3.5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-100 text-sm focus:outline-none focus:border-neutral-600 font-mono"
                             />
                             <p className="text-[10px] text-neutral-500 mt-1">
-                              Direct video link (Cloudinary, GitHub release, Imgur). Enables silent hover looping on cards & central play/pause when opened.
+                              Paste any direct video (Cloudinary, MP4) or YouTube link. Plays inline smoothly with auto-fallback to standalone viewer.
                             </p>
                           </div>
                         </div>
