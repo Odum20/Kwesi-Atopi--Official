@@ -30,7 +30,8 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(mode === 'card');
+  // Default to muted for guaranteed smooth autoplay across modern browser policies
+  const [isMuted, setIsMuted] = useState<boolean>(true);
   const [progress, setProgress] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -45,7 +46,48 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
   const youtubeId = getYouTubeId(resolvedVideoUrl);
   const isYouTube = Boolean(youtubeId);
 
-  // CARD MODE HOVER CONTROLLER (Direct HTML5 videos only)
+  // 1. PAGE VISIBILITY CONTROLLER: Pause media immediately when screen is hidden/collapsed
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && videoRef.current) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // 2. MODAL MODE AUTOPLAY CONTROLLER: Plays smoothly when opened/viewed
+  useEffect(() => {
+    if (mode !== 'modal' || !resolvedVideoUrl || isYouTube || videoError) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = isMuted;
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setIsPlaying(true))
+        .catch(() => {
+          // If unmuted playback was restricted by browser, mute and play smoothly
+          video.muted = true;
+          setIsMuted(true);
+          video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+        });
+    }
+
+    return () => {
+      video.pause();
+      setIsPlaying(false);
+    };
+  }, [mode, resolvedVideoUrl, isYouTube, videoError]);
+
+  // 3. CARD MODE HOVER CONTROLLER: Instant responsive hover with zero desync
   useEffect(() => {
     if (mode !== 'card' || !resolvedVideoUrl || isYouTube || videoError) return;
 
@@ -88,11 +130,15 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
     } else {
       isCancelled = true;
       video.pause();
+      video.currentTime = 0;
       setIsPlaying(false);
     }
 
     return () => {
       isCancelled = true;
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
     };
   }, [isHovered, mode, resolvedVideoUrl, isYouTube, videoError]);
 
@@ -138,8 +184,9 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
+    const nextMuted = !videoRef.current.muted;
+    videoRef.current.muted = nextMuted;
+    setIsMuted(nextMuted);
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -176,7 +223,7 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
           imageClassName={imageClassName}
         />
 
-        {/* Video Overlay on Hover (HTML5 Direct MP4/WebM) */}
+        {/* Video Overlay on Hover: Reveals smoothly as soon as hovered */}
         {resolvedVideoUrl && !isYouTube && !videoError && (
           <video
             ref={videoRef}
@@ -187,7 +234,7 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
             preload="metadata"
             onError={() => setVideoError(true)}
             className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ease-in-out ${
-              isHovered && isPlaying ? 'opacity-100' : 'opacity-0'
+              isHovered ? 'opacity-100' : 'opacity-0'
             }`}
           />
         )}
@@ -196,7 +243,7 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
         {resolvedVideoUrl && (
           <div
             className={`absolute bottom-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-neutral-950/80 border border-neutral-800 text-[10px] font-mono text-neutral-300 backdrop-blur-md pointer-events-none transition-all duration-200 ${
-              isHovered && isPlaying ? 'opacity-0 scale-95' : 'opacity-85 scale-100'
+              isHovered ? 'opacity-0 scale-95' : 'opacity-85 scale-100'
             }`}
           >
             {isYouTube ? (
@@ -220,8 +267,9 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
   if (isYouTube && youtubeId) {
     return (
       <div className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-neutral-800 shadow-2xl ${className}`}>
+        {/* Added mute=1 and playsinline=1 to guarantee seamless autoplay when opened */}
         <iframe
-          src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+          src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1`}
           title={alt}
           className="w-full h-full border-0 rounded-2xl"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -259,9 +307,10 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
             src={resolvedVideoUrl}
             poster={src ? resolveAssetUrl(src) : undefined}
             playsInline
+            autoPlay
             muted={isMuted}
             loop
-            preload="metadata"
+            preload="auto"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onWaiting={() => setIsBuffering(true)}
@@ -366,10 +415,20 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
                 <button
                   type="button"
                   onClick={toggleMute}
-                  className="p-1 hover:text-white transition-colors cursor-pointer"
-                  title={isMuted ? "Unmute" : "Mute"}
+                  className="p-1 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+                  title={isMuted ? "Unmute Sound" : "Mute Sound"}
                 >
-                  {isMuted ? <VolumeX className="w-4 h-4 text-neutral-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+                  {isMuted ? (
+                    <>
+                      <VolumeX className="w-4 h-4 text-amber-400" />
+                      <span className="text-[10px] text-amber-300 font-medium">Unmute</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-4 h-4 text-emerald-400" />
+                      <span className="text-[10px] text-emerald-400 font-medium">Sound On</span>
+                    </>
+                  )}
                 </button>
 
                 {/* Standalone Action in bottom bar */}
@@ -388,7 +447,7 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
           </div>
         </div>
       ) : resolvedVideoUrl && videoError ? (
-        /* Plan B Fallback Card if video fails to decode */
+        /* Fallback Card if video fails to decode */
         <div className="relative w-full h-full min-h-[320px] flex flex-col items-center justify-center bg-neutral-950 p-6 text-center border border-neutral-800 rounded-2xl">
           <AlertCircle className="w-10 h-10 text-amber-400 mb-3" />
           <h4 className="text-base font-semibold text-neutral-200 mb-1">In-App Playback Restricted</h4>
