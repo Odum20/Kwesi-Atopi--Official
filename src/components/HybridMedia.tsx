@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Film, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Film, ExternalLink, Loader2, AlertCircle, Maximize2 } from 'lucide-react';
 import { ProjectImage } from './ProjectImage';
 import { resolveAssetUrl } from '../lib/resolveAsset';
 
@@ -46,7 +46,28 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
   const youtubeId = getYouTubeId(resolvedVideoUrl);
   const isYouTube = Boolean(youtubeId);
 
-  // 1. PAGE VISIBILITY CONTROLLER: Pause media immediately when screen is hidden/collapsed
+  // 1. VIEWPORT OBSERVER: Pre-buffer card video streams as soon as they scroll into view
+  useEffect(() => {
+    if (mode !== 'card' || !resolvedVideoUrl || isYouTube || videoError) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && videoRef.current) {
+            videoRef.current.preload = 'auto';
+          }
+        });
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [mode, resolvedVideoUrl, isYouTube, videoError]);
+
+  // 2. PAGE VISIBILITY CONTROLLER: Pause media immediately when screen is hidden/collapsed
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && videoRef.current) {
@@ -61,7 +82,7 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
     };
   }, []);
 
-  // 2. MODAL MODE AUTOPLAY CONTROLLER: Plays smoothly when opened/viewed
+  // 3. MODAL MODE AUTOPLAY CONTROLLER: Plays smoothly when opened/viewed
   useEffect(() => {
     if (mode !== 'modal' || !resolvedVideoUrl || isYouTube || videoError) return;
 
@@ -87,7 +108,7 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
     };
   }, [mode, resolvedVideoUrl, isYouTube, videoError]);
 
-  // 3. CARD MODE HOVER CONTROLLER: Instant responsive hover with zero desync
+  // 4. CARD MODE HOVER CONTROLLER: Instant responsive hover with zero cache purging
   useEffect(() => {
     if (mode !== 'card' || !resolvedVideoUrl || isYouTube || videoError) return;
 
@@ -98,6 +119,8 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
 
     if (isHovered) {
       video.muted = true;
+      video.preload = 'auto';
+
       const playVideo = () => {
         if (isCancelled || !videoRef.current) return;
         const playPromise = videoRef.current.play();
@@ -129,8 +152,8 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
       }
     } else {
       isCancelled = true;
+      // CRITICAL FIX: Simply pause without resetting currentTime = 0 so buffered frames remain in RAM!
       video.pause();
-      video.currentTime = 0;
       setIsPlaying(false);
     }
 
@@ -171,6 +194,25 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
       video.pause();
       setIsPlaying(false);
       triggerCenterIconPulse();
+    }
+  };
+
+  const toggleFullscreen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const container = containerRef.current;
+    const video = videoRef.current;
+
+    if (!document.fullscreenElement) {
+      if (container && container.requestFullscreen) {
+        container.requestFullscreen().catch((err) => console.error('Fullscreen failed:', err));
+      } else if (video && (video as any).webkitEnterFullscreen) {
+        (video as any).webkitEnterFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch((err) => console.error('Exit fullscreen failed:', err));
+      }
     }
   };
 
@@ -231,7 +273,7 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             onError={() => setVideoError(true)}
             className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ease-in-out ${
               isHovered ? 'opacity-100' : 'opacity-0'
@@ -266,8 +308,10 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
   // MODAL (EXPANDED) MODE: YOUTUBE EMBED
   if (isYouTube && youtubeId) {
     return (
-      <div className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-neutral-800 shadow-2xl ${className}`}>
-        {/* Added mute=1 and playsinline=1 to guarantee seamless autoplay when opened */}
+      <div
+        ref={containerRef}
+        className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-neutral-800 shadow-2xl ${className}`}
+      >
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1`}
           title={alt}
@@ -431,17 +475,16 @@ export const HybridMedia: React.FC<HybridMediaProps> = ({
                   )}
                 </button>
 
-                {/* Standalone Action in bottom bar */}
-                <a
-                  href={resolvedVideoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1 hover:text-emerald-400 transition-colors cursor-pointer flex items-center gap-1 text-[11px]"
-                  title="Open video standalone in new tab"
+                {/* Fullscreen Action in bottom bar */}
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  className="p-1 text-neutral-300 hover:text-emerald-400 transition-colors cursor-pointer flex items-center gap-1 text-[11px]"
+                  title="Maximize View (Fullscreen)"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Standalone</span>
-                </a>
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Fullscreen</span>
+                </button>
               </div>
             </div>
           </div>
